@@ -1,79 +1,3 @@
-#' Ouvrir l'application Shiny d'édition du tableur
-#' 
-#' Cette fonction permet d'ouvrir l'interface graphique s'appuyant 
-#' sur les fonctions de formatage du package pour éditer des tableaux plus rapidement
-#' 
-#' @return Rien n'est renvoyé, l'appli s'ouvre.
-#' 
-#' @importFrom shiny runApp
-#' @importFrom shiny shinyAppDir
-#' @importFrom shiny fileInput
-#' @importFrom shiny shinyApp
-#' @importFrom shiny tags
-#' @importFrom shiny checkboxInput
-#' @importFrom shiny radioButtons
-#' @importFrom shiny textInput
-#' @importFrom shiny tableOutput
-#' @importFrom shiny uiOutput
-#' @importFrom shiny verbatimTextOutput
-#' @importFrom shiny actionButton
-#' @importFrom shiny req
-#' @importFrom shiny renderUI
-#' @importFrom shiny renderPrint
-#' @importFrom shiny selectInput
-#' @importFrom shiny observeEvent
-#' @importFrom shiny showModal
-#' @importFrom shiny removeModal
-#' @importFrom shiny p
-#' @importFrom shiny div
-#' @importFrom shiny fluidRow
-#' @importFrom shiny column
-#' @importFrom shiny tabPanel
-#' @importFrom shiny downloadButton
-#' @importFrom shiny downloadHandler
-#' @importFrom shiny icon
-#' @importFrom shinycssloaders withSpinner
-#' @importFrom shinyalert shinyalert
-#' @importFrom shinyWidgets prettyRadioButtons
-#' @importFrom shinyWidgets actionBttn
-#' @importFrom shinyWidgets downloadBttn
-#' @importFrom bs4Dash dashboardPage
-#' @importFrom bs4Dash dashboardHeader
-#' @importFrom bs4Dash dashboardSidebar
-#' @importFrom bs4Dash dashboardFooter
-#' @importFrom bs4Dash dashboardBody
-#' @importFrom bs4Dash bs4DashControlbar
-#' @importFrom bs4Dash tabBox
-#' @importFrom bs4Dash sidebarMenu
-#' @importFrom bs4Dash menuItem
-#' @importFrom bs4Dash tabItems
-#' @importFrom bs4Dash tabItem
-#' @importFrom bs4Dash updateTabItems
-#' @importFrom bs4Dash skinSelector
-#' @importFrom magrittr %>%
-#' @importFrom openxlsx write.xlsx
-#' @importFrom purrr map
-#' @importFrom purrr set_names
-#' @importFrom purrr %>%
-#' @importFrom stringr str_replace
-#' @importFrom stringr str_trim
-#' @importFrom rstudioapi selectFile
-#' @importFrom rstudioapi selectDirectory
-#' @importFrom DT datatable
-#' @importFrom DT DTOutput
-#' @importFrom DT renderDataTable
-#' @importFrom DT selectRows
-#' @importFrom DT selectCells
-#' @importFrom DT dataTableProxy
-#' 
-#' @export
-#' 
-#' @examples
-#' library(agreste)
-#' \dontrun{
-#' app_formatage()
-#' }
-
 library(shiny)
 library(shinycssloaders)
 library(shinyalert)
@@ -88,12 +12,12 @@ library(DT)
 wd <- getwd()
 
 ui = dashboardPage(
-  title = "Mise en forme de tableaux",
+  title = "Land Registry UX",
   dark = NULL,
   scrollToTop = TRUE,
-  header = dashboardHeader(title = "Mise en forme de tableaux",
+  header = dashboardHeader(title = "Land Registry",
                            div(style = "position:relative; left:calc(80%);",
-                               actionBttn("close", "Fermer",
+                               actionBttn("close", "Close",
                                           color = "danger",
                                           icon = icon("door-open")))
                            ),
@@ -102,24 +26,21 @@ ui = dashboardPage(
   sidebar = dashboardSidebar(
     minified = FALSE,
     sidebarMenu(id = "tabs",
-                menuItem("Vue d'ensemble",
+                menuItem("Overview",
                          tabName = "overview",
                          icon = icon("globe")),
-              menuItem('Import de fichiers',
+              menuItem('New Contract',
                        tabName = 'import',
                        icon = icon('upload')),
-              menuItem("Paramètres d'import",
-                       tabName = 'import_param',
-                       icon = icon('bars')),
-              menuItem('Ordre des tableaux',
-                       tabName = 'table_order',
-                       icon = icon('sort')),
-              menuItem('Format des tableaux',
-                       tabName = 'table_format',
-                       icon = icon('table')),
-              menuItem('Enregistrement',
-                       tabName = 'sauvegarde',
-                       icon = icon('download'))
+              menuItem("Payment",
+                       tabName = 'payment',
+                       icon = icon('money')),
+              menuItem('Sign Contract',
+                       tabName = 'sign_contract',
+                       icon = icon('pen')),
+              menuItem('Checking',
+                       tabName = 'checking',
+                       icon = icon('check'))
     
       )
     ),
@@ -225,7 +146,7 @@ ui = dashboardPage(
           actionBttn(inputId = "datadir", label = "Dossier de données", icon = icon("folder"), color = "royal"),
           verbatimTextOutput(outputId = "dirpath"))
       ),
-      tabItem(tabName = "import_param",
+      tabItem(tabName = "payment",
               div(style="display: inline-block;vertical-align:top; width: 500px;",
                   radioButtons("sep", "Separateur",
                      choices = c(Virgule = ",",
@@ -249,115 +170,13 @@ ui = dashboardPage(
                     value = TRUE
                   )
                 )),
-      tabItem(tabName = "table_order",
+      tabItem(tabName = "sign_contract",
               p("Sélectionnez tous les fichiers dans l'ordre que vous souhaitez pour le modifier :"),
               DTOutput("files_order"),
               verbatimTextOutput("liste_ordre"),
               actionBttn("validate_order", "Valider", color = "success",
                          icon = icon("check"))),
-      tabItem(tabName = "table_format",
-              DTOutput("files"),
-              DTOutput("contents") %>% withSpinner(),
-              tabBox(
-                width = 12,
-                tabPanel(
-                  title = "Paramètres",
-                  tabBox(
-                tabPanel(title = "Titres",
-                         id = "tab_titles",
-                         textInput("feuille", "Nom de la feuille :"),
-                         textInput("titre_primeur", "Titre du document (si primeur)"),
-                         textInput("title", "Titre du tableau :")),
-                tabPanel(title = "Colonnes",
-                         id = "tab_cols",
-                         uiOutput("deroul"),
-                         uiOutput("larg"),
-                         actionBttn("validate_colonnes", "Valider", color = "success",
-                                    icon = icon("check"))),
-                tabPanel(title = "Lignes",
-                         id = "tab_lines",
-                         p("Séléctionnez les lignes souhaitées puis cliquez sur le bouton pour les formater :"),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_titre", "Lignes de surtitre")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_section", "Lignes de section")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_precision_1", "Lignes de précision 1")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_precision_2", "Lignes de précision 2")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_precision_3", "Lignes de précision 3")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_precision_4", "Lignes de précision 4")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_sous_total", "Lignes de sous-total")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_total", "Lignes de total")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             actionButton("lignes_italique", "Lignes en italique")),
-                         tags$hr(),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_titre")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_section")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_precision_1")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_precision_2")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_precision_3")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_precision_4")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_sous_total")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_total")),
-                         div(style="display: inline-block;vertical-align:top; width: 100px;",
-                             verbatimTextOutput("disp_lignes_italique"))),
-                tabPanel(title = "Unités",
-                         id = "tab_units",
-                         radioButtons(inputId = "is_unite_unif",
-                                      label = "L'unité est commune à toutes les colonnes :",
-                                      choices = c("Oui" = "oui",
-                                                  "Non" = "non"),
-                                      selected = "oui"),
-                         p("(remplir uniquement la première si oui)"),
-                         uiOutput("unites"),
-                         actionBttn("validate_unites", "Valider", color = "success",
-                                    icon = icon("check"))),
-                tabPanel(title = "Textes",
-                         id = "tab_text",
-                         tags$h5("Lecture :"),
-                         div(style="display: inline-block;vertical-align:top; width: 300px;",
-                             textInput("note", "Note de lecture :")),
-                         div(style="display: inline-block;vertical-align:top; width: 300px;",
-                             textInput("source", "Source")),
-                         div(style="display: inline-block;vertical-align:top; width: 300px;",
-                             textInput("champ", "Champ")),
-                         tags$br(),
-                         tags$h5("Sommaire :"),
-                         p("Laissez les champs vides si identiques au tableau précédent"),
-                         div(style="display: inline-block;vertical-align:top; width: 300px;",
-                             textInput("chapitre", "Nom du chapitre :")),
-                         div(style="display: inline-block;vertical-align:top; width: 300px;",
-                             textInput("sous_chapitre", "Nom du sous-chapitre :"))),
-                width = 12, 
-                height = 500,
-                collapsed = FALSE,
-                id = "setting_box"
-              )),
-                tabPanel(
-                  title = "Cellules à fusionner",
-                  DTOutput("contents_fusion"),
-                  verbatimTextOutput("liste_fusion"),
-                  actionBttn("add_fusion", "Fusionner",
-                             color = "royal", icon = icon("plus")),
-                  actionBttn("delete_last_merge", "Annuler la dernière fusion",
-                             color = "warning", icon = icon("trash"))
-                )
-              )
-              ),
-      tabItem(tabName = "sauvegarde",
+      tabItem(tabName = "checking",
               downloadBttn("exporter", "Exporter le plan"),
               downloadBttn("enreg", "Enregistrer les tableaux formatés"))
     )
@@ -370,7 +189,7 @@ server = function(input, output, session) {
   
   # next and previous buttons
   global <- reactiveValues(tab_id = "")
-  tab_id <- c('overview', 'import','import_param','table_order','table_format','sauvegarde')
+  tab_id <- c('overview', 'import','payment','sign_contract','checking')
   
   Current <- reactiveValues(
     Tab = "overview"
