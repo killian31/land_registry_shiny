@@ -96,10 +96,10 @@ ui = dashboardPage(
                     )
                 ),
             div(class = "card text-white bg-success mb-3", style = "max-width: 20rem;",
-                div(class = "card-header", tags$h4("Receipt")),
+                div(class = "card-header", tags$h4("Download deed")),
                 div(class = "card-body",
                     div(class = "card-text",
-                        "You can download a receipt for your transaction."
+                        "You can download your title deed on this tab."
                     )
                 )))
       ),

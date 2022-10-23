@@ -5,7 +5,7 @@ account: killiansteunou
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 7392437
-bundleId: 6432193
+bundleId: 6432800
 url: https://killiansteunou.shinyapps.io/land_registry_shiny/
-when: 1666545892.96023
-lastSyncTime: 1666545892.96024
+when: 1666564528.16432
+lastSyncTime: 1666564528.16434
