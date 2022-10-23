@@ -68,7 +68,7 @@ ui = dashboardPage(
         tags$h5("Please have a look at these instructions before starting."),
         div(class = "card-deck",
             div(class = "card text-white bg-primary mb-3", style = "max-width: 20rem;",
-            div(class = "card-header", tags$h4("New Contract")),
+            div(class = "card-header", tags$h4("Upload Documents")),
             div(class = "card-body",
                 div(class = "card-title", "Import your documents:"),
                 div(class = "card-text",
@@ -98,10 +98,10 @@ ui = dashboardPage(
                     )
                 ),
             div(class = "card text-white bg-success mb-3", style = "max-width: 20rem;",
-                div(class = "card-header", tags$h4("Check the transaction")),
+                div(class = "card-header", tags$h4("Receipt")),
                 div(class = "card-body",
                     div(class = "card-text",
-                        "Verifiy every detail of the contract before sending it."
+                        "You can download a receipt for your transaction."
                     )
                 )))
       ),
@@ -333,6 +333,61 @@ server = function(input, output, session) {
     }
   })
   
+  paymentModal <- function(failed = FALSE) {
+    modalDialog(
+      disabled(textInput(inputId = "payment_amount", label = "Amount", value = "RS. 1500")),
+      
+      footer = tagList(
+        modalButton("Cancel"),
+        actionButton("ok", "Ok"),
+        tags$script(src = "https://www.paypalobjects.com/api/checkout.js"),
+        tags$script("paypal.Button.render({
+                            // Configure environment
+                            env: 'sandbox',
+                            client: {
+                            sandbox: 'demo_sandbox_client_id',
+                            production: 'demo_production_client_id'
+                            },
+                            // Customize button (optional)
+                            locale: 'en_US',
+                            style: {
+                            size: 'small',
+                            color: 'gold',
+                            shape: 'pill',
+                            },
+                            // Set up a payment
+                            payment: function (data, actions) {
+                            return actions.payment.create({
+                            transactions: [{
+                            amount: {
+                            total: '0.01',
+                            currency: 'USD'
+                            }
+                            }]
+                            });
+                            },
+                            // Execute the payment
+                            onAuthorize: function (data, actions) {
+                            return actions.payment.execute()
+                            .then(function () {
+                            // Show a confirmation message to the buyer
+                            window.alert('Thank you for your purchase!');
+                            });
+                            }
+                            }, '#paypal_button');"),
+        tags$div(id = "paypal_button"))
+    )
+  }
+  
+  observeEvent(input$pay_btn, {
+    showModal(paymentModal())
+  })
+  
+  observeEvent(input$ok, {
+    removeModal()
+    shinyalert("Payment successful", text = "Your payment has been received.", type = "success")
+    print(input$paypal_button)
+  })
 }
 
 shinyApp(ui = ui,
