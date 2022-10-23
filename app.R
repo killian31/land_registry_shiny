@@ -231,7 +231,9 @@ ui = dashboardPage(
                              color = "success")
                  )
               ),
-      tabItem(tabName = "receipt")
+      tabItem(tabName = "receipt",
+              tags$h4("Click here to download your recepit."),
+              downloadBttn(outputId = "download_receipt", label = "Download recepit", style = "jelly", color = "royal"))
     )
   )
 )
@@ -433,6 +435,15 @@ server = function(input, output, session) {
     toggleState(id = "bankId_input")
     toggleState(id = "land_type")
   })
+  
+  output$download_receipt <- downloadHandler(
+    filename = function() {
+      paste("receipt-", Sys.Date(), ".txt", sep = "")
+    },
+    content = function(file) {
+      writeLines("This is a fake receipt.", file)
+    }
+  )
 }
 
 shinyApp(ui = ui,
