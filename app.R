@@ -210,20 +210,21 @@ ui = dashboardPage(
                             label = "Bank ID",
                             width = "1000px"),
                   tags$hr(),
-                  selectInput(inputId = "transaction_type",
+                  disabled(selectInput(inputId = "transaction_type",
                               label = "Nature of transaction",
                               choices = c('Whole land',
-                                          'Split land')),
+                                          'Split land'))),
                   selectInput(inputId = "land_type",
                               label = "Type of land",
                               choices = c('Residential',
                                           'Agricultural',
                                           'Industrial',
                                           'Work area')),
-                  dateInput(inputId = "deadline_date",
+                  disabled(dateInput(inputId = "deadline_date",
                             label = "Deadline date",
                             format = "dd-mm-yyyy",
-                            width = "1000px"),
+                            width = "1000px",
+                            value = "05-11-2022")),
                   actionBttn(inputId = "sign_contract_btn",
                              label = "Sign contract digitally",
                              icon = icon("signature"),
@@ -386,7 +387,51 @@ server = function(input, output, session) {
   observeEvent(input$ok, {
     removeModal()
     shinyalert("Payment successful", text = "Your payment has been received.", type = "success")
-    print(input$paypal_button)
+  })
+  
+  observeEvent(input$sign_contract_btn, {
+    filled_up <- TRUE
+    if (input$name_input == "" & filled_up) {
+      filled_up <- FALSE
+      shinyalert(title = "Missing field", text = "Your name is missing", type = "error", closeOnClickOutside = TRUE)
+    }
+    if (input$aadhaar_input == "" & filled_up) {
+      filled_up <- FALSE
+      shinyalert(title = "Missing field", text = "Your Aadhaar number is missing", type = "error", closeOnClickOutside = TRUE)
+    }
+    if (input$address_input == "" & filled_up) {
+      filled_up <- FALSE
+      shinyalert(title = "Missing field", text = "Your address is missing", type = "error", closeOnClickOutside = TRUE)
+    }
+    if (input$bankId_input == "" & filled_up) {
+      filled_up <- FALSE
+      shinyalert(title = "Missing field", text = "Your bank ID is missing", type = "error", closeOnClickOutside = TRUE)
+    }
+    
+    if (filled_up) {
+      showModal(modalDialog(
+      tagList(
+        p("You will not be able to make any changes after you confirm")
+      ),
+      title = "Are you sure you want to sign?",
+      footer = tagList(modalButton("Cancel"),
+                       actionButton("confirmSignature", "Confirm")
+                       )))
+    }
+    
+  })
+  
+  observeEvent(input$confirmSignature, {
+    removeModal()
+    shinyalert(title = "Signature successful!",
+               text = "Your contract have been digitally signed with the following associated hash: e3c897afcdd6471a00c29ae8a511eea4f65f3ed4dddba3d836a94e648d33ed04",
+               type = "success", closeOnClickOutside = TRUE)
+    toggleState(id = "name_input")
+    toggleState(id = "aadhaar_input")
+    toggleState(id = "birth_input")
+    toggleState(id = "address_input")
+    toggleState(id = "bankId_input")
+    toggleState(id = "land_type")
   })
 }
 
