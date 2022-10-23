@@ -39,7 +39,7 @@ ui = dashboardPage(
               menuItem('Sign Contract',
                        tabName = 'sign_contract',
                        icon = icon('pen')),
-              menuItem('Receipt',
+              menuItem('Download Deed',
                        tabName = 'receipt',
                        icon = icon('check'))
     
@@ -219,8 +219,8 @@ ui = dashboardPage(
                  )
               ),
       tabItem(tabName = "receipt",
-              tags$h4("Click here to download your recepit."),
-              downloadBttn(outputId = "download_receipt", label = "Download recepit", style = "jelly", color = "royal"))
+              tags$h4("Click here to download your title deed."),
+              downloadBttn(outputId = "download_receipt", label = "Download title deed", style = "jelly", color = "royal"))
     )
   )
 )
@@ -412,10 +412,10 @@ server = function(input, output, session) {
   
   output$download_receipt <- downloadHandler(
     filename = function() {
-      paste("receipt-", Sys.Date(), ".txt", sep = "")
+      paste("Deed-", Sys.Date(), ".txt", sep = "")
     },
     content = function(file) {
-      writeLines("This is a fake receipt.", file)
+      writeLines("This is a fake title deed.", file)
     }
   )
 }
