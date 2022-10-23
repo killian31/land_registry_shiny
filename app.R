@@ -280,14 +280,57 @@ server = function(input, output, session) {
   
   observeEvent(input$validate_docs, {
     is_error <- FALSE
-    if is.null(input$upload_photo){
+    if (is.null(input$upload_photo) & !is_error){
       is_error <- TRUE
-      shinyalert(title = "A document is missing", text = "The photo has not been uploaded."; type = "error")
+      shinyalert(title = "A document is missing",
+                 text = "The photo has not been uploaded.",
+                 type = "error")
     }
-    if !is_error {
+    if (is.null(input$upload_id) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The ID has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_attorney) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The power of attorney has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_property_reg) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The latest property registers card copy has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_municipal_tax) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The municipal tax bill has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_construction) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The construction completion certificate has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_no_objection) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The No Objection Certificate has not been uploaded.",
+                 type = "error")
+    }
+    if (is.null(input$upload_deed) & !is_error){
+      is_error <- TRUE
+      shinyalert(title = "A document is missing",
+                 text = "The verified sale deed has not been uploaded.",
+                 type = "error")
+    }
+    if (!is_error) {
       shinyalert(title = "All documents have been sent", type = "success")
     }
-
   })
   
 }
