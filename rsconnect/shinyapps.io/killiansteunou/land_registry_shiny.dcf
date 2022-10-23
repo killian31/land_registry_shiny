@@ -1,0 +1,11 @@
+name: land_registry_shiny
+title:
+username:
+account: killiansteunou
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7392437
+bundleId: 6432138
+url: https://killiansteunou.shinyapps.io/land_registry_shiny/
+when: 1666544245.45067
+lastSyncTime: 1666544245.45068
